@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(php -v)",
+      "PowerShell(composer -V)",
+      "PowerShell(composer create-project laravel/laravel . --prefer-dist 2>&1)"
+    ]
+  }
+}
