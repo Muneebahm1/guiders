@@ -45,7 +45,7 @@
 
         <div class="board" id="oppRows">
             <div class="board-row header">
-                <div>Program / Journal</div><div>Type</div><div>Country</div><div>Deadline</div>
+                <div>Program / Journal</div><div>Requirements</div><div>Type</div><div>Country</div><div>Deadline</div>
                 @if (!auth()->user()->isCounselor())
                     <div>Countdown</div>
                 @endif
@@ -53,6 +53,91 @@
             @include('opportunities._rows')
         </div>
     </div>
+@if (auth()->user()->isAdmin())
+    <div class="modal fade" id="oppEditModal" tabindex="-1" aria-labelledby="oppEditTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable modal-fullscreen-sm-down">
+            <form method="POST" id="oppEditForm" class="modal-content">
+                @csrf
+                @method('PUT')
+                <div class="modal-header">
+                    <h5 class="modal-title" id="oppEditTitle">Edit Opportunity</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Program / Journal name</label>
+                            <input class="form-control" name="name" id="edit-name" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Country</label>
+                            <input class="form-control" name="country" id="edit-country">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Type</label>
+                            <select class="form-select" name="type" id="edit-type">
+                                <option value="study_abroad">Study Abroad</option>
+                                <option value="research_publication">Research Publication</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Deadline</label>
+                            <input class="form-control" type="date" name="deadline" id="edit-deadline" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Official website link</label>
+                            <input class="form-control" name="official_link" id="edit-official">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Application portal link</label>
+                            <input class="form-control" name="application_link" id="edit-application">
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Total process cost</label>
+                            <input class="form-control" type="number" step="0.01" min="0" name="cost" id="edit-cost">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Currency</label>
+                            <input class="form-control" name="currency" id="edit-currency" maxlength="3">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Requirements</label>
+                            <textarea class="form-control" name="requirements" id="edit-requirements" rows="3"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Guidance notes for counselors</label>
+                            <textarea class="form-control" name="guidance" id="edit-guidance" rows="4"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="oppDeleteModal" tabindex="-1" aria-labelledby="oppDeleteTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form method="POST" id="oppDeleteForm" class="modal-content">
+                @csrf
+                @method('DELETE')
+                <div class="modal-header">
+                    <h5 class="modal-title" id="oppDeleteTitle">Delete opportunity?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    You are about to delete <strong id="oppDeleteName"></strong>. This cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+@endif
 @endsection
 
 @push('scripts')
@@ -68,6 +153,29 @@
                     $('#oppRows').append(html);
                 });
             }, 250);
+        });
+
+        $(document).on('click', '.btn-opp-edit', function () {
+            const d = this.dataset;
+            $('#oppEditForm').attr('action', d.updateUrl);
+            $('#edit-name').val(d.name);
+            $('#edit-country').val(d.country);
+            $('#edit-type').val(d.type);
+            $('#edit-deadline').val(d.deadline);
+            $('#edit-official').val(d.official);
+            $('#edit-application').val(d.application);
+            $('#edit-cost').val(d.cost);
+            $('#edit-currency').val(d.currency);
+            $('#edit-requirements').val(d.requirements);
+            $('#edit-guidance').val(d.guidance);
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('oppEditModal')).show();
+        });
+
+        $(document).on('click', '.btn-opp-delete', function () {
+            const d = this.dataset;
+            $('#oppDeleteForm').attr('action', d.deleteUrl);
+            $('#oppDeleteName').text(d.name);
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('oppDeleteModal')).show();
         });
 
         $(document).on('click', '.download-package', function () {

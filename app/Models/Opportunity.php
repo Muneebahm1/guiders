@@ -24,6 +24,11 @@ class Opportunity extends Model
         return $this->hasMany(Student::class);
     }
 
+    public function papers()
+    {
+        return $this->hasMany(Paper::class);
+    }
+
     public function sessions()
     {
         return $this->hasMany(OpportunitySession::class);

@@ -38,7 +38,9 @@ Route::get('/home/ping', [HomeController::class, 'ping'])->name('home.ping');
 
 Route::get('/opportunities', [OpportunityController::class, 'index'])->name('opportunities.index');
 Route::post('/opportunities', [OpportunityController::class, 'store'])->name('opportunities.store');
-Route::post('/opportunities/{opportunity}/sessions', [OpportunityController::class, 'storeSession'])->name('opportunities.sessions.store');
+Route::put('/opportunities/{opportunity}', [OpportunityController::class, 'update'])->name('opportunities.update')->middleware('role:admin');
+Route::delete('/opportunities/{opportunity}', [OpportunityController::class, 'destroy'])->name('opportunities.destroy')->middleware('role:admin');
+Route::post('/opportunities/{opportunity}/sessions',[OpportunityController::class, 'storeSession'])->name('opportunities.sessions.store');
 Route::delete('/opportunities/sessions/{session}', [OpportunityController::class, 'destroySession'])->name('opportunities.sessions.destroy');
 
 Route::get('/leads', [LeadController::class, 'index'])->name('leads.index');

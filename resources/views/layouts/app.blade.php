@@ -54,6 +54,10 @@
                     <div class="alert alert-success no-print">{{ session('status') }}</div>
                 @endif
 
+                @if (session('error'))
+                    <div class="alert alert-danger no-print">{{ session('error') }}</div>
+                @endif
+
                 @yield('content')
             </div>
         </div>

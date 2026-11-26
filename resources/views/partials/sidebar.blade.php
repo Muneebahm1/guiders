@@ -12,6 +12,12 @@
         </div>
     </div>
 
+    <button type="button" class="sidebar-toggle" aria-expanded="false" aria-controls="sidebarMenu"
+            onclick="(function(b){var s=b.closest('.sidebar');var o=s.classList.toggle('sidebar-open');b.setAttribute('aria-expanded',o);})(this)">
+        <span>Menu</span><span class="sidebar-toggle-icon">&#9776;</span>
+    </button>
+
+    <div class="sidebar-menu" id="sidebarMenu">
     <div class="nav-label">{{ $roleLabels[$user->role] }}</div>
 
     @if ($user->hasBackOfficeAccess())
@@ -117,5 +123,6 @@
         @else
             Can view all opportunities and register new students you've referred. Only sees your own referred students.
         @endif
+    </div>
     </div>
 </div>

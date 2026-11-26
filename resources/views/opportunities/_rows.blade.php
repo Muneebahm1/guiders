@@ -1,9 +1,8 @@
 @forelse ($opportunities as $opportunity)
     @php $days = $opportunity->daysLeft(); @endphp
     <div class="board-row">
-        <div>
+        <div data-label="Program">
             <div class="board-prog">{{ $opportunity->name }}</div>
-            <div class="board-req">{{ $opportunity->requirements }}</div>
             <div class="board-meta">
                 <span class="cost-tag">{{ $opportunity->currency }} {{ number_format($opportunity->cost, 0) }}</span>
                 @if (!auth()->user()->isCounselor())
@@ -61,19 +60,39 @@
                 </div>
             @endif
         </div>
-        <div>
+        <div class="board-req" data-label="Requirements">{{ $opportunity->requirements ?: '—' }}</div>
+        <div data-label="Type">
             <span class="type-tag {{ $opportunity->type === 'study_abroad' ? 'sa' : 'rp' }}">
                 {{ $opportunity->type === 'study_abroad' ? 'STUDY' : 'PAPER' }}
             </span>
         </div>
-        <div class="board-country">{{ $opportunity->country }}</div>
-        <div class="flap">{{ $opportunity->deadline->toDateString() }}</div>
+        <div class="board-country" data-label="Country">{{ $opportunity->country }}</div>
+        <div class="flap" data-label="Deadline">{{ $opportunity->deadline->toDateString() }}</div>
         @if (!auth()->user()->isCounselor())
-            <div class="countdown {{ $days < 0 ? 'late' : ($days <= 14 ? 'soon' : 'ok') }}">
+            <div class="countdown {{ $days < 0 ? 'late' : ($days <= 14 ? 'soon' : 'ok') }}" data-label="Countdown">
                 {{ $days < 0 ? 'T+'.abs($days).'D LATE' : ($days === 0 ? 'TODAY' : 'T-'.$days.'D') }}
             </div>
         @endif
     </div>
+    @if (auth()->user()->isAdmin())
+        <div class="board-admin-bar">
+            <button type="button" class="btn btn-outline-secondary btn-sm btn-opp-edit"
+                    data-update-url="{{ route('opportunities.update', $opportunity) }}"
+                    data-name="{{ $opportunity->name }}"
+                    data-country="{{ $opportunity->country }}"
+                    data-type="{{ $opportunity->type }}"
+                    data-deadline="{{ $opportunity->deadline->toDateString() }}"
+                    data-official="{{ $opportunity->official_link }}"
+                    data-application="{{ $opportunity->application_link }}"
+                    data-cost="{{ $opportunity->cost }}"
+                    data-currency="{{ $opportunity->currency }}"
+                    data-requirements="{{ $opportunity->requirements }}"
+                    data-guidance="{{ $opportunity->guidance }}">Edit</button>
+            <button type="button" class="btn btn-outline-danger btn-sm btn-opp-delete"
+                    data-delete-url="{{ route('opportunities.destroy', $opportunity) }}"
+                    data-name="{{ $opportunity->name }}">Delete</button>
+        </div>
+    @endif
 @empty
     <div class="board-empty">No opportunities match your search.</div>
 @endforelse

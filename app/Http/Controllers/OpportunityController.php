@@ -59,6 +59,43 @@ class OpportunityController extends Controller
         return redirect()->route('opportunities.index')->with('status', 'Opportunity added.');
     }
 
+    public function update(Request $request, Opportunity $opportunity)
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'country' => ['nullable', 'string', 'max:255'],
+            'type' => ['required', 'in:study_abroad,research_publication'],
+            'deadline' => ['required', 'date'],
+            'requirements' => ['nullable', 'string'],
+            'official_link' => ['nullable', 'string', 'max:255'],
+            'application_link' => ['nullable', 'string', 'max:255'],
+            'cost' => ['nullable', 'numeric', 'min:0'],
+            'currency' => ['nullable', 'string', 'max:3'],
+            'guidance' => ['nullable', 'string'],
+        ]);
+
+        $opportunity->update($data);
+
+        ActivityLog::record('opportunity.updated', "Updated opportunity \"{$opportunity->name}\"");
+
+        return redirect()->route('opportunities.index')->with('status', 'Opportunity updated.');
+    }
+
+    public function destroy(Opportunity $opportunity)
+    {
+        if ($opportunity->papers()->exists()) {
+            return redirect()->route('opportunities.index')
+                ->with('error', "\"{$opportunity->name}\" has linked student papers and cannot be deleted. Reassign or remove those papers first.");
+        }
+
+        $name = $opportunity->name;
+        $opportunity->delete();
+
+        ActivityLog::record('opportunity.deleted', "Deleted opportunity \"{$name}\"");
+
+        return redirect()->route('opportunities.index')->with('status', 'Opportunity deleted.');
+    }
+
     public function storeSession(Request $request, Opportunity $opportunity)
     {
         $data = $request->validate([
